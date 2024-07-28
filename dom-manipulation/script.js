@@ -1,70 +1,39 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const addButton = document.getElementById('add-task-btn');
-    const taskInput = document.getElementById('task-input');
-    const taskList = document.getElementById('task-list');
+    const quotes = [
+        "The only limit to our realization of tomorrow is our doubts of today.",
+        "Life is 10% what happens to us and 90% how we react to it.",
+        "Success is not the key to happiness. Happiness is the key to success."
+    ];
 
-    // Function to load tasks from Local Storage
-    function loadTasks() {
-        const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        storedTasks.forEach(taskText => addTask(taskText, false));
+    const quoteDisplay = document.getElementById('quoteDisplay');
+    const newQuoteBtn = document.getElementById('newQuote');
+    const addQuoteBtn = document.getElementById('addQuoteBtn');
+
+    function showRandomQuote() {
+        const randomIndex = Math.floor(Math.random() * quotes.length);
+        const randomQuote = quotes[randomIndex];
+        quoteDisplay.textContent = `"${randomQuote}"`;
     }
 
-    // Function to add a new task
-    function addTask(taskText, save = true) {
-        const listItem = document.createElement('li');
-        listItem.textContent = taskText;
+    function addQuote() {
+        const newQuoteText = document.getElementById('newQuoteText').value;
+        const newQuoteCategory = document.getElementById('newQuoteCategory').value;
 
-        const removeButton = document.createElement('button');
-        removeButton.textContent = "Remove";
-        removeButton.classList.add('remove-btn');
-        removeButton.onclick = () => {
-            taskList.removeChild(listItem);
-            removeTaskFromStorage(taskText);
-        };
-
-        listItem.appendChild(removeButton);
-        taskList.appendChild(listItem);
-
-        if (save) {
-            saveTaskToStorage(taskText);
+        if (newQuoteText.trim() === "" || newQuoteCategory.trim() === "") {
+            alert("Please enter both a quote and a category.");
+            return;
         }
+
+        const newQuote = `${newQuoteText} - ${newQuoteCategory}`;
+        quotes.push(newQuote);
+        document.getElementById('newQuoteText').value = "";
+        document.getElementById('newQuoteCategory').value = "";
+        alert("Quote added successfully!");
     }
 
-    // Function to save task to Local Storage
-    function saveTaskToStorage(taskText) {
-        const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        storedTasks.push(taskText);
-        localStorage.setItem('tasks', JSON.stringify(storedTasks));
-    }
+    newQuoteBtn.addEventListener('click', showRandomQuote);
+    addQuoteBtn.addEventListener('click', addQuote);
 
-    // Function to remove task from Local Storage
-    function removeTaskFromStorage(taskText) {
-        let storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        storedTasks = storedTasks.filter(task => task !== taskText);
-        localStorage.setItem('tasks', JSON.stringify(storedTasks));
-    }
-
-    addButton.addEventListener('click', () => {
-        const taskText = taskInput.value.trim();
-        if (taskText) {
-            addTask(taskText);
-            taskInput.value = '';
-        } else {
-            alert("Please enter a task.");
-        }
-    });
-
-    taskInput.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            const taskText = taskInput.value.trim();
-            if (taskText) {
-                addTask(taskText);
-                taskInput.value = '';
-            } else {
-                alert("Please enter a task.");
-            }
-        }
-    });
-
-    loadTasks();
+    // Initial quote display
+    showRandomQuote();
 });
