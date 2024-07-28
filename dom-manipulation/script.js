@@ -1,18 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
     const quotes = [
-        "The only limit to our realization of tomorrow is our doubts of today.",
-        "Life is 10% what happens to us and 90% how we react to it.",
-        "Success is not the key to happiness. Happiness is the key to success."
+        { text: "The only limit to our realization of tomorrow is our doubts of today.", category: "Motivation" },
+        { text: "Life is 10% what happens to us and 90% how we react to it.", category: "Life" },
+        { text: "Success is not the key to happiness. Happiness is the key to success.", category: "Success" }
     ];
 
     const quoteDisplay = document.getElementById('quoteDisplay');
     const newQuoteBtn = document.getElementById('newQuote');
-    const addQuoteBtn = document.getElementById('addQuoteBtn');
+    const addQuoteBtn = document.createElement('button');
+    addQuoteBtn.textContent = 'Add Quote';
+    document.body.appendChild(addQuoteBtn);
 
     function showRandomQuote() {
         const randomIndex = Math.floor(Math.random() * quotes.length);
         const randomQuote = quotes[randomIndex];
-        quoteDisplay.textContent = `"${randomQuote}"`;
+        while (quoteDisplay.firstChild) {
+            quoteDisplay.removeChild(quoteDisplay.firstChild);
+        }
+        const quoteText = document.createTextNode(`"${randomQuote.text}" - ${randomQuote.category}`);
+        quoteDisplay.appendChild(quoteText);
     }
 
     function addQuote() {
@@ -24,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const newQuote = `${newQuoteText} - ${newQuoteCategory}`;
+        const newQuote = { text: newQuoteText, category: newQuoteCategory };
         quotes.push(newQuote);
         document.getElementById('newQuoteText').value = "";
         document.getElementById('newQuoteCategory').value = "";
