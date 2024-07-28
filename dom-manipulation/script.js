@@ -7,18 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const quoteDisplay = document.getElementById('quoteDisplay');
     const newQuoteBtn = document.getElementById('newQuote');
-    const addQuoteBtn = document.createElement('button');
-    addQuoteBtn.textContent = 'Add Quote';
-    document.body.appendChild(addQuoteBtn);
 
     function showRandomQuote() {
         const randomIndex = Math.floor(Math.random() * quotes.length);
         const randomQuote = quotes[randomIndex];
-        while (quoteDisplay.firstChild) {
-            quoteDisplay.removeChild(quoteDisplay.firstChild);
-        }
-        const quoteText = document.createTextNode(`"${randomQuote.text}" - ${randomQuote.category}`);
-        quoteDisplay.appendChild(quoteText);
+        quoteDisplay.innerHTML = `"${randomQuote.text}" - ${randomQuote.category}`;
     }
 
     function addQuote() {
@@ -38,6 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     newQuoteBtn.addEventListener('click', showRandomQuote);
+    
+    // Create and append the input fields and button for adding new quotes
+    const quoteInputContainer = document.createElement('div');
+    quoteInputContainer.innerHTML = `
+        <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+        <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+        <button id="addQuoteBtn">Add Quote</button>
+    `;
+    document.body.appendChild(quoteInputContainer);
+
+    const addQuoteBtn = document.getElementById('addQuoteBtn');
     addQuoteBtn.addEventListener('click', addQuote);
 
     // Initial quote display
