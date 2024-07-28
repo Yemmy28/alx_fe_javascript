@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const quoteDisplay = document.getElementById('quoteDisplay');
     const newQuoteBtn = document.getElementById('newQuote');
     const exportBtn = document.getElementById('exportQuotes');
+    const addQuoteBtn = document.getElementById('addQuoteBtn');
+    const importFileInput = document.getElementById('importFile');
 
     function showRandomQuote() {
         if (quotes.length === 0) {
@@ -42,19 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showRandomQuote();
     }
 
-    function createAddQuoteForm() {
-        const quoteInputContainer = document.createElement('div');
-        quoteInputContainer.innerHTML = `
-            <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
-            <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
-            <button id="addQuoteBtn">Add Quote</button>
-        `;
-        document.body.appendChild(quoteInputContainer);
-
-        const addQuoteBtn = document.getElementById('addQuoteBtn');
-        addQuoteBtn.addEventListener('click', () => addQuote(true));
-    }
-
     function exportQuotes() {
         const dataStr = JSON.stringify(quotes);
         const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -79,26 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
         fileReader.readAsText(event.target.files[0]);
     }
 
-    function createImportExportButtons() {
-        const exportButton = document.createElement('button');
-        exportButton.innerText = 'Export Quotes';
-        exportButton.id = 'exportQuotes';
-        document.body.appendChild(exportButton);
-        exportButton.addEventListener('click', exportQuotes);
-
-        const importFileInput = document.createElement('input');
-        importFileInput.type = 'file';
-        importFileInput.id = 'importFile';
-        importFileInput.accept = '.json';
-        importFileInput.addEventListener('change', importFromJsonFile);
-        document.body.appendChild(importFileInput);
-    }
-
     newQuoteBtn.addEventListener('click', showRandomQuote);
+    addQuoteBtn.addEventListener('click', () => addQuote(true));
+    exportBtn.addEventListener('click', exportQuotes);
+    importFileInput.addEventListener('change', importFromJsonFile);
 
     loadQuotes();
-    createAddQuoteForm();
-    createImportExportButtons();
 
     // Show last quote from session storage if available
     const lastQuote = JSON.parse(sessionStorage.getItem('lastQuote'));
