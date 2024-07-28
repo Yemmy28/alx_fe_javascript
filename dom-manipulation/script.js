@@ -1,20 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const quotes = [
-        { text: "The only limit to our realization of tomorrow is our doubts of today.", category: "Motivation" },
-        { text: "Life is 10% what happens to us and 90% how we react to it.", category: "Life" },
-        { text: "Success is not the key to happiness. Happiness is the key to success.", category: "Success" }
-    ];
+    const quotes = JSON.parse(localStorage.getItem('quotes') || '[]');
 
     const quoteDisplay = document.getElementById('quoteDisplay');
     const newQuoteBtn = document.getElementById('newQuote');
+    const exportBtn = document.getElementById('exportQuotes');
 
     function showRandomQuote() {
+        if (quotes.length === 0) {
+            quoteDisplay.innerHTML = "No quotes available.";
+            return;
+        }
         const randomIndex = Math.floor(Math.random() * quotes.length);
         const randomQuote = quotes[randomIndex];
         quoteDisplay.innerHTML = `"${randomQuote.text}" - ${randomQuote.category}`;
+        sessionStorage.setItem('lastQuote', JSON.stringify(randomQuote));
     }
 
-    function addQuote(taskText, save = true) {
+    function addQuote(save = true) {
         const newQuoteText = document.getElementById('newQuoteText').value;
         const newQuoteCategory = document.getElementById('newQuoteCategory').value;
 
@@ -27,9 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quotes.push(newQuote);
 
         if (save) {
-            const storedQuotes = JSON.parse(localStorage.getItem('quotes') || '[]');
-            storedQuotes.push(newQuote);
-            localStorage.setItem('quotes', JSON.stringify(storedQuotes));
+            localStorage.setItem('quotes', JSON.stringify(quotes));
         }
 
         document.getElementById('newQuoteText').value = "";
@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadQuotes() {
-        const storedQuotes = JSON.parse(localStorage.getItem('quotes') || '[]');
-        storedQuotes.forEach(quote => addQuote(quote.text, quote.category, false)); // 'false' indicates not to save again to Local Storage
+        quotes.forEach(quote => addQuote(false)); // 'false' indicates not to save again to Local Storage
+        showRandomQuote();
     }
 
     function createAddQuoteForm() {
@@ -55,10 +55,56 @@ document.addEventListener('DOMContentLoaded', () => {
         addQuoteBtn.addEventListener('click', () => addQuote(true));
     }
 
+    function exportQuotes() {
+        const dataStr = JSON.stringify(quotes);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'quotes.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function importFromJsonFile(event) {
+        const fileReader = new FileReader();
+        fileReader.onload = function(event) {
+            const importedQuotes = JSON.parse(event.target.result);
+            quotes.push(...importedQuotes);
+            localStorage.setItem('quotes', JSON.stringify(quotes));
+            alert('Quotes imported successfully!');
+            loadQuotes();
+        };
+        fileReader.readAsText(event.target.files[0]);
+    }
+
+    function createImportExportButtons() {
+        const exportButton = document.createElement('button');
+        exportButton.innerText = 'Export Quotes';
+        exportButton.id = 'exportQuotes';
+        document.body.appendChild(exportButton);
+        exportButton.addEventListener('click', exportQuotes);
+
+        const importFileInput = document.createElement('input');
+        importFileInput.type = 'file';
+        importFileInput.id = 'importFile';
+        importFileInput.accept = '.json';
+        importFileInput.addEventListener('change', importFromJsonFile);
+        document.body.appendChild(importFileInput);
+    }
+
     newQuoteBtn.addEventListener('click', showRandomQuote);
 
-    // Initial setup
     loadQuotes();
     createAddQuoteForm();
-    showRandomQuote();
+    createImportExportButtons();
+
+    // Show last quote from session storage if available
+    const lastQuote = JSON.parse(sessionStorage.getItem('lastQuote'));
+    if (lastQuote) {
+        quoteDisplay.innerHTML = `"${lastQuote.text}" - ${lastQuote.category}`;
+    } else {
+        showRandomQuote();
+    }
 });
