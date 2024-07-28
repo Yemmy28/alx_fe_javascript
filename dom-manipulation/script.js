@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quoteDisplay.innerHTML = `"${randomQuote.text}" - ${randomQuote.category}`;
     }
 
-    function addQuote() {
+    function addQuote(taskText, save = true) {
         const newQuoteText = document.getElementById('newQuoteText').value;
         const newQuoteCategory = document.getElementById('newQuoteCategory').value;
 
@@ -25,25 +25,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const newQuote = { text: newQuoteText, category: newQuoteCategory };
         quotes.push(newQuote);
+
+        if (save) {
+            const storedQuotes = JSON.parse(localStorage.getItem('quotes') || '[]');
+            storedQuotes.push(newQuote);
+            localStorage.setItem('quotes', JSON.stringify(storedQuotes));
+        }
+
         document.getElementById('newQuoteText').value = "";
         document.getElementById('newQuoteCategory').value = "";
         alert("Quote added successfully!");
     }
 
+    function loadQuotes() {
+        const storedQuotes = JSON.parse(localStorage.getItem('quotes') || '[]');
+        storedQuotes.forEach(quote => addQuote(quote.text, quote.category, false)); // 'false' indicates not to save again to Local Storage
+    }
+
+    function createAddQuoteForm() {
+        const quoteInputContainer = document.createElement('div');
+        quoteInputContainer.innerHTML = `
+            <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+            <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+            <button id="addQuoteBtn">Add Quote</button>
+        `;
+        document.body.appendChild(quoteInputContainer);
+
+        const addQuoteBtn = document.getElementById('addQuoteBtn');
+        addQuoteBtn.addEventListener('click', () => addQuote(true));
+    }
+
     newQuoteBtn.addEventListener('click', showRandomQuote);
-    
-    // Create and append the input fields and button for adding new quotes
-    const quoteInputContainer = document.createElement('div');
-    quoteInputContainer.innerHTML = `
-        <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
-        <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
-        <button id="addQuoteBtn">Add Quote</button>
-    `;
-    document.body.appendChild(quoteInputContainer);
 
-    const addQuoteBtn = document.getElementById('addQuoteBtn');
-    addQuoteBtn.addEventListener('click', addQuote);
-
-    // Initial quote display
+    // Initial setup
+    loadQuotes();
+    createAddQuoteForm();
     showRandomQuote();
 });
