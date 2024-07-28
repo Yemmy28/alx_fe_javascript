@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     let quotes = JSON.parse(localStorage.getItem('quotes') || '[]');
     const quoteDisplay = document.getElementById('quoteDisplay');
     const newQuoteBtn = document.getElementById('newQuote');
@@ -106,39 +106,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Function to sync with server
-    function syncWithServer() {
-        fetch(serverUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(quotes)
-        }).then(response => response.json())
-          .then(data => {
-              console.log('Data synced with server:', data);
-          }).catch(error => {
-              console.error('Error syncing data:', error);
-          });
+    async function syncWithServer() {
+        try {
+            const response = await fetch(serverUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(quotes)
+            });
+            const data = await response.json();
+            console.log('Data synced with server:', data);
+        } catch (error) {
+            console.error('Error syncing data:', error);
+        }
     }
 
     // Function to fetch quotes from the server
-    function fetchQuotesFromServer() {
-        fetch(serverUrl)
-            .then(response => response.json())
-            .then(serverQuotes => {
-                // Compare and update local quotes with server data
-                const localQuotesSet = new Set(quotes.map(q => JSON.stringify(q)));
-                const serverQuotesSet = new Set(serverQuotes.map(q => JSON.stringify(q)));
+    async function fetchQuotesFromServer() {
+        try {
+            const response = await fetch(serverUrl);
+            const serverQuotes = await response.json();
+            // Compare and update local quotes with server data
+            const localQuotesSet = new Set(quotes.map(q => JSON.stringify(q)));
+            const serverQuotesSet = new Set(serverQuotes.map(q => JSON.stringify(q)));
 
-                // Simple conflict resolution: Server data takes precedence
-                if (serverQuotesSet.size > localQuotesSet.size) {
-                    quotes = serverQuotes;
-                    localStorage.setItem('quotes', JSON.stringify(quotes));
-                    alert('Quotes updated from server!');
-                }
-                populateCategories();
-                showRandomQuote();
-            }).catch(error => {
-                console.error('Error fetching data from server:', error);
-            });
+            // Simple conflict resolution: Server data takes precedence
+            if (serverQuotesSet.size > localQuotesSet.size) {
+                quotes = serverQuotes;
+                localStorage.setItem('quotes', JSON.stringify(quotes));
+                alert('Quotes updated from server!');
+            }
+            populateCategories();
+            showRandomQuote();
+        } catch (error) {
+            console.error('Error fetching data from server:', error);
+        }
     }
 
     // Event listeners
@@ -164,5 +165,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Fetch quotes from server on load to check for updates
-    fetchQuotesFromServer();
+    await fetchQuotesFromServer();
 });
