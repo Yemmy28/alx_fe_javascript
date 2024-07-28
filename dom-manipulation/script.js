@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (save) {
             localStorage.setItem('quotes', JSON.stringify(quotes));
-            syncWithServer();
+            syncQuotes();
         }
 
         document.getElementById('newQuoteText').value = "";
@@ -105,8 +105,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         fileReader.readAsText(event.target.files[0]);
     }
 
-    // Function to sync with server
-    async function syncWithServer() {
+    // Function to sync quotes with server
+    async function syncQuotes() {
         try {
             const response = await fetch(serverUrl, {
                 method: 'POST',
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     addQuoteBtn.addEventListener('click', () => addQuote(true));
     exportBtn.addEventListener('click', exportQuotes);
     importFileInput.addEventListener('change', importFromJsonFile);
-    syncBtn.addEventListener('click', syncWithServer);
+    syncBtn.addEventListener('click', syncQuotes);
 
     populateCategories();
     showRandomQuote();
