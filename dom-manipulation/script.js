@@ -47,12 +47,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('newQuoteCategory').value = "";
 
         populateCategories();
+        showRandomQuote();
         alert("Quote added successfully!");
     }
 
     // Function to populate categories in the filter dropdown
     function populateCategories() {
         categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+        const categories = new Set(quotes.map(q => q.category));
         categories.forEach(category => {
             const option = document.createElement('option');
             option.value = category;
@@ -96,16 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const importedQuotes = JSON.parse(event.target.result);
             quotes.push(...importedQuotes);
             localStorage.setItem('quotes', JSON.stringify(quotes));
-            alert('Quotes imported successfully!');
             populateCategories();
             showRandomQuote();
+            alert('Quotes imported successfully!');
         };
         fileReader.readAsText(event.target.files[0]);
     }
 
     // Function to sync with server
     function syncWithServer() {
-        // Example of posting data to the server
         fetch(serverUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -118,11 +119,12 @@ document.addEventListener('DOMContentLoaded', () => {
           });
     }
 
-    // Function to fetch data from the server
-    function fetchFromServer() {
+    // Function to fetch quotes from the server
+    function fetchQuotesFromServer() {
         fetch(serverUrl)
             .then(response => response.json())
             .then(serverQuotes => {
+                // Compare and update local quotes with server data
                 const localQuotesSet = new Set(quotes.map(q => JSON.stringify(q)));
                 const serverQuotesSet = new Set(serverQuotes.map(q => JSON.stringify(q)));
 
@@ -161,6 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showRandomQuote();
     }
 
-    // Fetch data from server on load to check for updates
-    fetchFromServer();
+    // Fetch quotes from server on load to check for updates
+    fetchQuotesFromServer();
 });
