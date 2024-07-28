@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const importFileInput = document.getElementById('importFile');
     const categoryFilter = document.getElementById('categoryFilter');
     const syncBtn = document.getElementById('syncData');
+    const notification = document.getElementById('notification'); // New notification element
 
     // Simulate server URL (replace with actual URL if using a real server)
     const serverUrl = 'https://jsonplaceholder.typicode.com/posts';
@@ -115,8 +116,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             const data = await response.json();
             console.log('Data synced with server:', data);
+            displayNotification('Quotes synced with server!');
         } catch (error) {
             console.error('Error syncing data:', error);
+            displayNotification('Error syncing quotes with server.');
         }
     }
 
@@ -133,13 +136,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (serverQuotesSet.size > localQuotesSet.size) {
                 quotes = serverQuotes;
                 localStorage.setItem('quotes', JSON.stringify(quotes));
-                alert('Quotes updated from server!');
+                displayNotification('Quotes updated from server!');
             }
             populateCategories();
             showRandomQuote();
         } catch (error) {
             console.error('Error fetching data from server:', error);
         }
+    }
+
+    // Function to display notifications
+    function displayNotification(message) {
+        notification.innerHTML = message;
+        setTimeout(() => {
+            notification.innerHTML = '';
+        }, 5000); // Clear message after 5 seconds
     }
 
     // Set up periodic sync with server
