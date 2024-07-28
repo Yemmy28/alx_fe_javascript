@@ -142,6 +142,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Set up periodic sync with server
+    setInterval(async () => {
+        await fetchQuotesFromServer();
+    }, 60000); // Sync every 60 seconds
+
     // Event listeners
     newQuoteBtn.addEventListener('click', showRandomQuote);
     addQuoteBtn.addEventListener('click', () => addQuote(true));
